@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -6,12 +7,10 @@ public class Main {
 
     private static final List<String> quitFromApp = List.of("выход", "2", "нет");
     private static final List<String> startNewGame = List.of("новая игра", "1", "да");
-    private static List<String> generatedWord;
+    private static List<String> splitedGeneratedWord;
     private static final ArrayList<String> usedChars = new ArrayList<>();
     private static String[] guessedWord;
     private static int mistakes = 0;
-    private static String language = "ru";
-    private static int wordLength = 5;
     private static boolean quitFromGame = false;
 
     public static void main(String[] args) {
@@ -23,21 +22,17 @@ public class Main {
         if (quitFromApp.contains(newGameOrQuit.toLowerCase())) {
             System.out.println("Хорошо, тогда в следующий раз!)");
         } else if (startNewGame.contains(newGameOrQuit.toLowerCase())) {
-            preGameMessages();
-            preGameSettings(scanner);
+            preGameMessage();
 
             while (!quitFromGame) {
-                generatedWord = RandomWordGenerator.splitGeneratedWord(RandomWordGenerator.generateWord(language, wordLength));
-
-                guessedWord = new String[generatedWord.size()];
-                for (int i = 0; i < guessedWord.length; i++) {
-                    guessedWord[i] = "_";
-                }
+                String generatedWord = RandomWordGenerator.generateWord();
+                splitedGeneratedWord = RandomWordGenerator.splitGeneratedWord(generatedWord);
+                guessedWord = new String[splitedGeneratedWord.size()];
+                Arrays.fill(guessedWord, "_");
 
                 printFormatGuessedWord(guessedWord);
 
-                String nextChar = null;
-
+                String nextChar;
                 while (!isUserGuessed()) {
                     nextChar = scanner.next();
                     if (nextChar.length() > 1) {
@@ -45,27 +40,16 @@ public class Main {
                         continue;
                     }
                     checkAndPrintGuessedWord(nextChar);
+                    if (mistakes >= 5) {
+                        System.out.println(String.format("Вы проиграли! Было загадано слово '%s'", generatedWord));
+                        break;
+                    }
                 }
-                afterGameMessages(scanner);
+                afterGameMessage(scanner);
             }
         }
     }
 
-    private static void afterGameMessages(Scanner scanner) {
-        System.out.println("Хотите завершить игру или начать заново?");
-        String quitFromGameAnswer = scanner.next();
-        if (!startNewGame.contains(quitFromGameAnswer)) {
-            System.out.println("Спасибо за игру!");
-            quitFromGame = !quitFromGame;
-        }
-    }
-
-    private static void printFormatGuessedWord(String[] guessedWord) {
-        for (String s : guessedWord) {
-            System.out.print(s + " ");
-        }
-        System.out.println();
-    }
 
     private static void checkAndPrintGuessedWord(String nextChar) {
         if (!usedChars.contains(nextChar)) {
@@ -74,37 +58,152 @@ public class Main {
             System.out.println("Эта буква уже была предложена!");
         }
 
-        for (int i = 0; i < guessedWord.length; i++) {
-            if (generatedWord.get(i).equalsIgnoreCase(nextChar)) {
-                guessedWord[i] = nextChar;
+        if (!splitedGeneratedWord.contains(nextChar)) {
+            mistakes += 1;
+        } else {
+            for (int i = 0; i < guessedWord.length; i++) {
+                if (splitedGeneratedWord.get(i).equalsIgnoreCase(nextChar)) {
+                    guessedWord[i] = nextChar;
+                }
             }
         }
 
+        printMistakes();
         printFormatGuessedWord(guessedWord);
+    }
+
+    private static void printMistakes() {
+
+        switch (mistakes) {
+            case 1 -> {
+                initialGallowsState();
+            }
+            case 2 -> {
+                secondMistakeGallowsState();
+            }
+            case 3 -> {
+                thirdMistakeGallowsState();
+            }
+            case 4 -> {
+                fourthMistakeGallowsState();
+            }
+            case 5 -> {
+                fifthMistakeGallowsState();
+            }
+        }
+    }
+
+    private static void printMistakesCount() {
+        System.out.print("Ошибки (" + mistakes + "): ");
+        for (String usedChar : usedChars) {
+            System.out.print(usedChar + " ");
+        }
+        System.out.println();
+    }
+
+    private static void printFormatGuessedWord(String[] guessedWord) {
+        System.out.print("Слово: ");
+        for (String s : guessedWord) {
+            System.out.print(s + " ");
+        }
+        System.out.println();
+        printMistakesCount();
     }
 
     private static boolean isUserGuessed() {
         for (int i = 0; i < guessedWord.length; i++) {
-            if (!guessedWord[i].equalsIgnoreCase(generatedWord.get(i))) return false;
+            if (!guessedWord[i].equalsIgnoreCase(splitedGeneratedWord.get(i))) return false;
         }
         return true;
     }
 
-    public static void preGameMessages() {
+    public static void preGameMessage() {
         System.out.println("Новая игра началась!");
-        System.out.println("Давайте сначала настроим игру :)");
     }
 
-    public static void preGameSettings(Scanner scanner) {
-        System.out.println("На каком языке предпочитаете угадывать слова? (ru/en/it/es/de)");
-        System.out.println("1. Русский (по-умолчанию)");
-        System.out.println("2. Английский");
-        System.out.println("3. Итальянский");
-        System.out.println("4. Испанский");
-        System.out.println("5. Немецкий");
-        language = scanner.next();
+    private static void afterGameMessage(Scanner scanner) {
+        System.out.println("Хотите начать заново или завершить игру?");
+        String quitFromGameAnswer = scanner.next();
+        if (!startNewGame.contains(quitFromGameAnswer)) {
+            System.out.println("Спасибо за игру!");
+            quitFromGame = true;
+        } else {
+            mistakes = 0;
+            usedChars.clear();
+        }
+    }
 
-        System.out.println("Так же, можно выбрать длину слов, но не меньше 2 и не больше 10 (по-умолчанию длина равна 5)");
-        wordLength = scanner.nextInt();
+    private static void initialGallowsState() {
+        char[][] gallows = {
+                {' ', '-', '-', '-', '-', '|'},
+                {' ', '|'},
+                {' ', '|'},
+                {' ', '|'},
+                {' ', '|'},
+                {'_', '_', '_', '_', '_', '_'},
+        };
+
+        printGallowsState(gallows);
+    }
+
+    private static void secondMistakeGallowsState() {
+        char[][] gallows = {
+                {' ', '-', '-', '-', '|', '-'},
+                {' ', '|', ' ', ' ', '○', ' '},
+                {' ', '|', ' ', ' ', '|', ' '},
+                {' ', '|'},
+                {' ', '|'},
+                {'_', '_', '_', '_', '_', '_'},
+        };
+
+        printGallowsState(gallows);
+    }
+
+    private static void thirdMistakeGallowsState() {
+        char[][] gallows = {
+                {' ', '-', '-', '-', '|', '-'},
+                {' ', '|', ' ', ' ', '○', ' '},
+                {' ', '|', ' ', ' ', '|', ' '},
+                {' ', '|', ' ', ' ', ' ', '\\'},
+                {' ', '|'},
+                {'_', '_', '_', '_', '_', '_'},
+        };
+
+        printGallowsState(gallows);
+    }
+
+    private static void fourthMistakeGallowsState() {
+        char[][] gallows = {
+                {' ', '-', '-', '-', '|', '-'},
+                {' ', '|', ' ', ' ', '○', ' '},
+                {' ', '|', ' ', ' ', '|', ' '},
+                {' ', '|', ' ', '/', ' ', '\\'},
+                {' ', '|'},
+                {'_', '_', '_', '_', '_', '_'},
+        };
+
+        printGallowsState(gallows);
+    }
+
+    private static void fifthMistakeGallowsState() {
+        char[][] gallows = {
+                {' ', '-', '-', '-', '|', '-'},
+                {' ', '|', ' ', ' ', '○', ' '},
+                {' ', '|', ' ', '/', '|', '\\'},
+                {' ', '|', ' ', '/', ' ', '\\'},
+                {' ', '|'},
+                {'_', '_', '_', '_', '_', '_'},
+        };
+
+        printGallowsState(gallows);
+    }
+
+    private static void printGallowsState(char[][] gallows) {
+        for (char[] chars : gallows) {
+            for (char aChar : chars) {
+                System.out.print(aChar);
+            }
+            System.out.print("\n");
+        }
     }
 }
