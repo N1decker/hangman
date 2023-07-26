@@ -7,7 +7,7 @@ public class Main {
 
     private static final List<String> quitFromApp = List.of("выход", "2", "нет");
     private static final List<String> startNewGame = List.of("новая игра", "1", "да");
-    private static List<String> splitedGeneratedWord;
+    private static List<String> splitGeneratedWord;
     private static final ArrayList<String> usedChars = new ArrayList<>();
     private static String[] guessedWord;
     private static int mistakes = 0;
@@ -26,8 +26,8 @@ public class Main {
 
             while (!quitFromGame) {
                 String generatedWord = RandomWordGenerator.generateWord();
-                splitedGeneratedWord = RandomWordGenerator.splitGeneratedWord(generatedWord);
-                guessedWord = new String[splitedGeneratedWord.size()];
+                splitGeneratedWord = RandomWordGenerator.splitGeneratedWord(generatedWord);
+                guessedWord = new String[splitGeneratedWord.size()];
                 Arrays.fill(guessedWord, "_");
 
                 printFormatGuessedWord(guessedWord);
@@ -41,7 +41,7 @@ public class Main {
                     }
                     checkAndPrintGuessedWord(nextChar);
                     if (mistakes >= 5) {
-                        System.out.println(String.format("Вы проиграли! Было загадано слово '%s'", generatedWord));
+                        System.out.printf("Вы проиграли! Было загадано слово '%s'%n", generatedWord);
                         break;
                     }
                 }
@@ -58,11 +58,11 @@ public class Main {
             System.out.println("Эта буква уже была предложена!");
         }
 
-        if (!splitedGeneratedWord.contains(nextChar)) {
+        if (!splitGeneratedWord.contains(nextChar)) {
             mistakes += 1;
         } else {
             for (int i = 0; i < guessedWord.length; i++) {
-                if (splitedGeneratedWord.get(i).equalsIgnoreCase(nextChar)) {
+                if (splitGeneratedWord.get(i).equalsIgnoreCase(nextChar)) {
                     guessedWord[i] = nextChar;
                 }
             }
@@ -75,21 +75,11 @@ public class Main {
     private static void printMistakes() {
 
         switch (mistakes) {
-            case 1 -> {
-                initialGallowsState();
-            }
-            case 2 -> {
-                secondMistakeGallowsState();
-            }
-            case 3 -> {
-                thirdMistakeGallowsState();
-            }
-            case 4 -> {
-                fourthMistakeGallowsState();
-            }
-            case 5 -> {
-                fifthMistakeGallowsState();
-            }
+            case 1 -> initialGallowsState();
+            case 2 -> secondMistakeGallowsState();
+            case 3 -> thirdMistakeGallowsState();
+            case 4 -> fourthMistakeGallowsState();
+            case 5 -> fifthMistakeGallowsState();
         }
     }
 
@@ -112,7 +102,7 @@ public class Main {
 
     private static boolean isUserGuessed() {
         for (int i = 0; i < guessedWord.length; i++) {
-            if (!guessedWord[i].equalsIgnoreCase(splitedGeneratedWord.get(i))) return false;
+            if (!guessedWord[i].equalsIgnoreCase(splitGeneratedWord.get(i))) return false;
         }
         return true;
     }
