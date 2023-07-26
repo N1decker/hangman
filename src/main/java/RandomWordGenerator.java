@@ -13,12 +13,8 @@ public class RandomWordGenerator {
             "министр", "гостиница", "потребность", "лето"};
 
     public static String generateWord() {
-        int randomInt;
-
         long count = russianWords.length;
-        randomInt = random.nextInt((int) count);
-        return russianWords[randomInt];
-
+        return russianWords[random.nextInt((int) count)];
     }
 
     public static List<String> splitGeneratedWord(String word) {
