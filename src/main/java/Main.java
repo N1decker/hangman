@@ -23,7 +23,6 @@ public class Main {
             System.out.println("Хорошо, тогда в следующий раз!)");
         } else if (startNewGame.contains(newGameOrQuit.toLowerCase())) {
             preGameMessage();
-
             gameLoop(scanner);
         }
     }
@@ -36,7 +35,6 @@ public class Main {
             Arrays.fill(guessedWord, "_");
 
             printFormatGuessedWord(guessedWord);
-
             gameRound(scanner, generatedWord);
             newGameOrQuitMessage(scanner);
         }
@@ -83,11 +81,11 @@ public class Main {
     private static void printMistakes() {
 
         switch (mistakes) {
-            case 1 -> initialGallowsState();
-            case 2 -> secondMistakeGallowsState();
-            case 3 -> thirdMistakeGallowsState();
-            case 4 -> fourthMistakeGallowsState();
-            case 5 -> fifthMistakeGallowsState();
+            case 1 -> Gallows.initialGallowsState();
+            case 2 -> Gallows.secondMistakeGallowsState();
+            case 3 -> Gallows.thirdMistakeGallowsState();
+            case 4 -> Gallows.fourthMistakeGallowsState();
+            case 5 -> Gallows.fifthMistakeGallowsState();
         }
     }
 
@@ -136,77 +134,5 @@ public class Main {
         }
     }
 
-    private static void initialGallowsState() {
-        char[][] gallows = {
-                {' ', '-', '-', '-', '-', '|'},
-                {' ', '|'},
-                {' ', '|'},
-                {' ', '|'},
-                {' ', '|'},
-                {'_', '_', '_', '_', '_', '_'},
-        };
 
-        printGallowsState(gallows);
-    }
-
-    private static void secondMistakeGallowsState() {
-        char[][] gallows = {
-                {' ', '-', '-', '-', '|', '-'},
-                {' ', '|', ' ', ' ', '○', ' '},
-                {' ', '|', ' ', ' ', '|', ' '},
-                {' ', '|'},
-                {' ', '|'},
-                {'_', '_', '_', '_', '_', '_'},
-        };
-
-        printGallowsState(gallows);
-    }
-
-    private static void thirdMistakeGallowsState() {
-        char[][] gallows = {
-                {' ', '-', '-', '-', '|', '-'},
-                {' ', '|', ' ', ' ', '○', ' '},
-                {' ', '|', ' ', ' ', '|', ' '},
-                {' ', '|', ' ', ' ', ' ', '\\'},
-                {' ', '|'},
-                {'_', '_', '_', '_', '_', '_'},
-        };
-
-        printGallowsState(gallows);
-    }
-
-    private static void fourthMistakeGallowsState() {
-        char[][] gallows = {
-                {' ', '-', '-', '-', '|', '-'},
-                {' ', '|', ' ', ' ', '○', ' '},
-                {' ', '|', ' ', ' ', '|', ' '},
-                {' ', '|', ' ', '/', ' ', '\\'},
-                {' ', '|'},
-                {'_', '_', '_', '_', '_', '_'},
-        };
-
-        printGallowsState(gallows);
-    }
-
-    private static void fifthMistakeGallowsState() {
-        char[][] gallows = {
-                {' ', '-', '-', '-', '|', '-'},
-                {' ', '|', ' ', ' ', '○', ' '},
-                {' ', '|', ' ', '/', '|', '\\'},
-                {' ', '|', ' ', '/', ' ', '\\'},
-                {' ', '|'},
-                {'_', '_', '_', '_', '_', '_'},
-        };
-
-        printGallowsState(gallows);
-    }
-
-    private static void printGallowsState(char[][] gallows) {
-        for (char[] chars : gallows) {
-            for (char aChar : chars) {
-                System.out.print(aChar);
-            }
-            System.out.print("\n");
-        }
-    }
 }
