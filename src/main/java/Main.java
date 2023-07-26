@@ -24,37 +24,45 @@ public class Main {
         } else if (startNewGame.contains(newGameOrQuit.toLowerCase())) {
             preGameMessage();
 
-            while (!quitFromGame) {
-                String generatedWord = RandomWordGenerator.generateWord();
-                splitGeneratedWord = RandomWordGenerator.splitGeneratedWord(generatedWord);
-                guessedWord = new String[splitGeneratedWord.size()];
-                Arrays.fill(guessedWord, "_");
+            gameLoop(scanner);
+        }
+    }
 
-                printFormatGuessedWord(guessedWord);
+    private static void gameLoop(Scanner scanner) {
+        while (!quitFromGame) {
+            String generatedWord = RandomWordGenerator.generateWord();
+            splitGeneratedWord = RandomWordGenerator.splitGeneratedWord(generatedWord);
+            guessedWord = new String[splitGeneratedWord.size()];
+            Arrays.fill(guessedWord, "_");
 
-                String nextChar;
-                while (!isUserGuessed()) {
-                    nextChar = scanner.next();
-                    if (nextChar.length() > 1) {
-                        System.out.println("Предлагайте только по одной букве");
-                        continue;
-                    }
-                    checkAndPrintGuessedWord(nextChar);
-                    if (mistakes >= 5) {
-                        System.out.printf("Вы проиграли! Было загадано слово '%s'%n", generatedWord);
-                        break;
-                    }
-                }
-                afterGameMessage(scanner);
+            printFormatGuessedWord(guessedWord);
+
+            gameRound(scanner, generatedWord);
+            newGameOrQuitMessage(scanner);
+        }
+    }
+
+    private static void gameRound(Scanner scanner, String generatedWord) {
+        String nextChar;
+        while (!isUserGuessed()) {
+            nextChar = scanner.next();
+            if (nextChar.length() > 1) {
+                System.out.println("Предлагайте только по одной букве");
+                continue;
+            }
+            checkAndPrintGuessedWord(nextChar);
+            if (mistakes >= 5) {
+                System.out.printf("Вы проиграли! Было загадано слово '%s'%n", generatedWord);
+                break;
             }
         }
     }
 
 
     private static void checkAndPrintGuessedWord(String nextChar) {
-        if (!usedChars.contains(nextChar)) {
+        if (!usedChars.contains(nextChar) && !splitGeneratedWord.contains(nextChar)) {
             usedChars.add(nextChar);
-        } else {
+        } else if (usedChars.contains(nextChar)){
             System.out.println("Эта буква уже была предложена!");
         }
 
@@ -104,6 +112,11 @@ public class Main {
         for (int i = 0; i < guessedWord.length; i++) {
             if (!guessedWord[i].equalsIgnoreCase(splitGeneratedWord.get(i))) return false;
         }
+
+        if (Arrays.equals(splitGeneratedWord.toArray(), guessedWord)) {
+            System.out.println("Вы выиграли!");
+            return true;
+        }
         return true;
     }
 
@@ -111,7 +124,7 @@ public class Main {
         System.out.println("Новая игра началась!");
     }
 
-    private static void afterGameMessage(Scanner scanner) {
+    private static void newGameOrQuitMessage(Scanner scanner) {
         System.out.println("Хотите начать заново или завершить игру?");
         String quitFromGameAnswer = scanner.next();
         if (!startNewGame.contains(quitFromGameAnswer)) {
