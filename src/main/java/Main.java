@@ -7,9 +7,10 @@ public class Main {
 
     private static final List<String> quitFromApp = List.of("выход", "2", "нет");
     private static final List<String> startNewGame = List.of("новая игра", "1", "да");
-    private static List<String> splitGeneratedWord;
     private static final ArrayList<String> usedChars = new ArrayList<>();
+    private static List<String> splitGeneratedWord;
     private static String[] guessedWord;
+
     private static int mistakes = 0;
     private static boolean quitFromGame = false;
 
