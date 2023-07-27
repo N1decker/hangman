@@ -1,47 +1,45 @@
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
 
-    private static final List<String> quitFromApp = List.of("выход", "2", "нет");
-    private static final List<String> startNewGame = List.of("новая игра", "1", "да");
+    private static final int ERROR_MAX = 6;
+    private static final Scaffold[] scaffoldStates = Scaffold.values();
     private static final ArrayList<String> usedChars = new ArrayList<>();
-    private static List<String> splitGeneratedWord;
-    private static String[] guessedWord;
-
+    private static String word;
+    private static String wordView;
     private static int mistakes = 0;
     private static boolean quitFromGame = false;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Начать новую игру или выйти из приложения?");
-        System.out.println("да/нет, 1/2, новая игра/выход");
+        System.out.println("Начать новую игру - y/Y, или выйти из приложения - n/N?");
         String newGameOrQuit = scanner.next();
 
-        if (quitFromApp.contains(newGameOrQuit.toLowerCase())) {
+        if (newGameOrQuit.matches("[nNтТ]")) {
             System.out.println("Хорошо, тогда в следующий раз!)");
-        } else if (startNewGame.contains(newGameOrQuit.toLowerCase())) {
+        } else if (newGameOrQuit.matches("[yYнН]")) {
             preGameMessage();
             gameLoop(scanner);
+        } else {
+            System.out.println("Раз нет такого варианта, завершаю игру!");
         }
     }
 
     private static void gameLoop(Scanner scanner) {
         while (!quitFromGame) {
-            String generatedWord = RandomWordGenerator.generateWord();
-            splitGeneratedWord = RandomWordGenerator.splitGeneratedWord(generatedWord);
-            guessedWord = new String[splitGeneratedWord.size()];
-            Arrays.fill(guessedWord, "_");
+            word = RandomWordGenerator.generateWord();
+            wordView = "_".repeat(word.length());
 
-            printFormatGuessedWord(guessedWord);
-            gameRound(scanner, generatedWord);
+            printWordView(wordView);
+            printMistakes();
+            gameRound(scanner, word);
             newGameOrQuitMessage(scanner);
         }
     }
 
-    private static void gameRound(Scanner scanner, String generatedWord) {
+    private static void gameRound(Scanner scanner, String word) {
         String nextChar;
         while (!isUserGuessed()) {
             nextChar = scanner.next();
@@ -50,8 +48,8 @@ public class Main {
                 continue;
             }
             checkAndPrintGuessedWord(nextChar);
-            if (mistakes >= 5) {
-                System.out.printf("Вы проиграли! Было загадано слово '%s'%n", generatedWord);
+            if (mistakes >= ERROR_MAX) {
+                System.out.printf("Вы проиграли! Было загадано слово '%s'%n", word);
                 break;
             }
         }
@@ -59,38 +57,38 @@ public class Main {
 
 
     private static void checkAndPrintGuessedWord(String nextChar) {
-        if (!usedChars.contains(nextChar) && !splitGeneratedWord.contains(nextChar)) {
+        char[] charWord = word.toCharArray();
+        char[] charWordView = wordView.toCharArray();
+        if (!usedChars.contains(nextChar) && !word.contains(nextChar)) {
             usedChars.add(nextChar);
-        } else if (usedChars.contains(nextChar)){
+        } else if (usedChars.contains(nextChar)) {
             System.out.println("Эта буква уже была предложена!");
         }
 
-        if (!splitGeneratedWord.contains(nextChar)) {
+        if (!word.contains(nextChar)) {
             mistakes += 1;
         } else {
-            for (int i = 0; i < guessedWord.length; i++) {
-                if (splitGeneratedWord.get(i).equalsIgnoreCase(nextChar)) {
-                    guessedWord[i] = nextChar;
+            for (int i = 0; i < wordView.length(); i++) {
+                if (charWord[i] == nextChar.charAt(0)) {
+                    charWordView[i] = charWord[i];
                 }
             }
+            wordView = new String(charWordView);
         }
-
+        printScaffoldState(mistakes);
+        printWordView(wordView);
         printMistakes();
-        printFormatGuessedWord(guessedWord);
+    }
+
+    private static void printWordView(String wordView) {
+        System.out.println("Слово: " + wordView);
+    }
+
+    private static void printScaffoldState(int mistakes) {
+        System.out.println(scaffoldStates[mistakes]);
     }
 
     private static void printMistakes() {
-
-        switch (mistakes) {
-            case 1 -> Gallows.initialGallowsState();
-            case 2 -> Gallows.secondMistakeGallowsState();
-            case 3 -> Gallows.thirdMistakeGallowsState();
-            case 4 -> Gallows.fourthMistakeGallowsState();
-            case 5 -> Gallows.fifthMistakeGallowsState();
-        }
-    }
-
-    private static void printMistakesCount() {
         System.out.print("Ошибки (" + mistakes + "): ");
         for (String usedChar : usedChars) {
             System.out.print(usedChar + " ");
@@ -98,21 +96,12 @@ public class Main {
         System.out.println();
     }
 
-    private static void printFormatGuessedWord(String[] guessedWord) {
-        System.out.print("Слово: ");
-        for (String s : guessedWord) {
-            System.out.print(s + " ");
-        }
-        System.out.println();
-        printMistakesCount();
-    }
-
     private static boolean isUserGuessed() {
-        for (int i = 0; i < guessedWord.length; i++) {
-            if (!guessedWord[i].equalsIgnoreCase(splitGeneratedWord.get(i))) return false;
+        for (int i = 0; i < wordView.length(); i++) {
+            if (wordView.charAt(i) != (word.charAt(i))) return false;
         }
 
-        if (Arrays.equals(splitGeneratedWord.toArray(), guessedWord)) {
+        if (Objects.equals(word, wordView)) {
             System.out.println("Вы выиграли!");
             return true;
         }
@@ -124,9 +113,9 @@ public class Main {
     }
 
     private static void newGameOrQuitMessage(Scanner scanner) {
-        System.out.println("Хотите начать заново или завершить игру?");
+        System.out.println("Хотите начать заново - (y/Y) или завершить игру(любая клавиша)?");
         String quitFromGameAnswer = scanner.next();
-        if (!startNewGame.contains(quitFromGameAnswer)) {
+        if (!quitFromGameAnswer.matches("[yYнН]")) {
             System.out.println("Спасибо за игру!");
             quitFromGame = true;
         } else {
@@ -134,6 +123,4 @@ public class Main {
             usedChars.clear();
         }
     }
-
-
 }

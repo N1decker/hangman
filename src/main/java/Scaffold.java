@@ -6,8 +6,8 @@ public enum Scaffold {
             return """
                     __________
                     |      |
-                    |      
-                    |      
+                    |     \s
+                    |     \s
                     |
                     |
                     __________
@@ -20,8 +20,8 @@ public enum Scaffold {
             return """
                     __________
                     |      |
-                    |      ○
-                    |      
+                    |      〇
+                    |     \s
                     |
                     |
                     __________
@@ -34,7 +34,7 @@ public enum Scaffold {
             return """
                     __________
                     |      |
-                    |      ○/
+                    |      〇/
                     |      |
                     |
                     |
@@ -47,9 +47,9 @@ public enum Scaffold {
         public String toString() {
             return """
                     __________
-                    |      |
-                    |    \\○/
-                    |      |
+                    |     |
+                    |    \\〇/
+                    |     |
                     |
                     |
                     __________
@@ -61,10 +61,10 @@ public enum Scaffold {
         public String toString() {
             return """
                     __________
-                    |      |
-                    |    \\○/
-                    |      |
-                    |       \\
+                    |     |
+                    |    \\〇/
+                    |     |
+                    |      \\
                     |
                     __________
                     """;
@@ -75,10 +75,10 @@ public enum Scaffold {
         public String toString() {
             return """
                     __________
-                    |      |
-                    |    \\○/
-                    |      |
-                    |     / \\
+                    |     |
+                    |    \\〇/
+                    |     |
+                    |    / \\
                     |
                     __________
                     """;

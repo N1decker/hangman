@@ -1,5 +1,3 @@
-import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 public class RandomWordGenerator {
@@ -15,9 +13,5 @@ public class RandomWordGenerator {
     public static String generateWord() {
         long count = russianWords.length;
         return russianWords[random.nextInt((int) count)];
-    }
-
-    public static List<String> splitGeneratedWord(String word) {
-        return Arrays.stream(word.split("")).toList();
     }
 }
